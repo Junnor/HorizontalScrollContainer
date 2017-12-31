@@ -14,63 +14,11 @@ extension NSNotification.Name {
 
 class JuScrollContainerView: UIView {
 
-    // MARK: - 父类通知
-    var containerTitle = ""  // 获取superview的title，为了更好的通知
-    var atCurrentIndexNotificationName: NSNotification.Name {
-        return NSNotification.Name(rawValue: "com.nyato.manzhanmiao.\(containerTitle)AtMenuItem")
-    }
-    
-    // MARK: - Public properties
-    
-    var defaultOffsetPage = 0   // 第一次展示的时候显示的页面，默认为第一页
-    
-    var menuTintColor = UIColor(red: 251/255.0, green: 250/255.0, blue: 251/255.0, alpha: 1.0) {
-        didSet {
-            menuView?.backgroundColor = menuTintColor
-        }
-    }
-    
-    var itemColor = UIColor.darkGray {
-        didSet {
-            for button in buttonItems {
-                button.titleLabel?.textColor = itemColor
-            }
-        }
-    }
-    var itemFont = UIFont.systemFont(ofSize: 15) {
-        didSet {
-            for button in buttonItems {
-                button.titleLabel?.font = itemFont
-            }
-        }
-    }
-    var indicatorColor = UIColor.gray {
-        didSet {
-            indicatorView?.backgroundColor = indicatorColor
-        }
-    }
-    
-    var indicatorWidth: CGFloat = 40 {
-        didSet {
-            indicatorView?.frame.size.width = indicatorWidth
-        }
-    }
-    
-    var indicatorHeight: CGFloat = 3 {
-        didSet {
-            indicatorView?.frame.size.height = indicatorHeight
-        }
-    }
-    
-    var menuViewHeight: CGFloat = 49 {
-        didSet {
-            layoutIfNeeded()
-        }
-    }
-    
-    // MARK: - Designated init view controller
+    // MARK: - Designated init
     init(frame: CGRect, buttonItems: [UIButton], viewItems: [UIView]) {
         super.init(frame: frame)
+        
+        print("init(frame: CGRect, buttonItems: [UIButton], viewItems: [UIView])")
         
         if buttonItems.count != viewItems.count {
             fatalError("items count not equal")
@@ -85,7 +33,7 @@ class JuScrollContainerView: UIView {
         
         addAllSubView()
         setupConstraints()
-        layoutSomeSubView()
+        resetSubviewsLayoutIfNeeded()
         firstLoadDataNotification()
     }
     
@@ -93,10 +41,88 @@ class JuScrollContainerView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
+
+    // MARK: - 父类通知
+    var containerTitle = ""  // 获取superview的title，为了更好的通知
+    var atCurrentIndexNotificationName: NSNotification.Name {
+        return NSNotification.Name(rawValue: "com.nyato.manzhanmiao.\(containerTitle)AtMenuItem")
+    }
+    
+    // MARK: - Public properties
+    
+    // 第一次展示的时候显示的页面，默认为第一页
+    var defaultOffsetPage = 0 {
+        didSet {
+            userDefaultOffsetPage = true
+        }
         
-        layoutSomeSubView()
+    }
+    
+    // For menu view
+    var menuViewHeight: CGFloat = 49 {
+        didSet {
+            print("set menuViewHeight")
+            menuHeight?.isActive = false
+            menuHeight = menuView.heightAnchor.constraint(equalToConstant: menuViewHeight)
+            menuHeight?.isActive = true
+        }
+    }
+    
+    var menuTitleViewColor = UIColor(red: 251/255.0, green: 250/255.0, blue: 251/255.0, alpha: 1.0) {
+        didSet {
+            print("set menuTitleViewColor")
+            menuTitleView?.backgroundColor = menuTitleViewColor
+        }
+    }
+    
+    // For button item
+    var unselectedItemColor = UIColor.darkGray {
+        didSet {
+            print("set unselectedItemColor")
+            for button in buttonItems {
+                button.titleLabel?.textColor = unselectedItemColor
+            }
+        }
+    }
+    
+    var selectedItemColor = UIColor.darkGray {
+        didSet {
+            print("set selectedItemColor")
+            for button in buttonItems {
+                button.titleLabel?.textColor = selectedItemColor
+            }
+        }
+    }
+
+    var itemFont = UIFont.systemFont(ofSize: 15) {
+        didSet {
+            print("set itemFont")
+            for button in buttonItems {
+                button.titleLabel?.font = itemFont
+            }
+        }
+    }
+    
+    // For indicator
+    var indicatorColor = UIColor.gray {
+        didSet {
+            print("set indicatorColor")
+            indicatorView?.backgroundColor = indicatorColor
+        }
+    }
+    
+    var indicatorWidth: CGFloat = 40 {
+        didSet {
+            print("set indicatorWidth")
+            indicatorView?.frame.size.width = indicatorWidth
+        }
+    }
+    
+    var indicatorHeight: CGFloat = 3 {
+        didSet {
+            print("set indicatorHeight")
+            indicatorView?.frame.size.height = indicatorHeight
+        }
     }
     
     // MARK: - Private properties
@@ -110,13 +136,15 @@ class JuScrollContainerView: UIView {
     private var titleStackView: UIStackView!
     private var indicatorView: UIView!
     
+    private var menuHeight: NSLayoutConstraint!
     private var titles: [String] = [String]()
     private var indicatorOriginsX: [CGFloat] = [CGFloat]()
     private var itemsViewFrameOriginX: [CGFloat] = [CGFloat]()
     
     private var indicatorViewLastOriginX: CGFloat = 0.0
     private var scale: CGFloat!
-    
+    private var userDefaultOffsetPage = false
+
     private let moveDuration: TimeInterval = 0.2
     private let realTitleBottomMargin: CGFloat = 6
     
@@ -125,11 +153,11 @@ class JuScrollContainerView: UIView {
     private func addAllSubView() {
         // Menu container
         menuView = UIView()
-        menuView.backgroundColor = menuTintColor
         self.addSubview(menuView)
         
         // Title container
         menuTitleView = UIView()
+        menuTitleView.backgroundColor = menuTitleViewColor
         titleStackView = UIStackView()
         
         // Indicator
@@ -144,9 +172,9 @@ class JuScrollContainerView: UIView {
         scrollView.showsHorizontalScrollIndicator = false
         
         for button in buttonItems {
-            button.setTitleColor(itemColor, for: .normal)
+            button.setTitleColor(unselectedItemColor, for: .normal)
             titles.append(button.currentTitle!)
-            button.titleLabel?.textColor = itemColor
+            button.titleLabel?.textColor = unselectedItemColor
             button.titleLabel?.font = itemFont
             button.addTarget(self,
                              action: #selector(contentOffSetXForButton(sender:)),
@@ -181,7 +209,7 @@ class JuScrollContainerView: UIView {
         let menuTop = menuView.topAnchor.constraint(equalTo: topAnchor)
         let menuLeading = menuView.leadingAnchor.constraint(equalTo: leadingAnchor)
         let menuTrailing = menuView.trailingAnchor.constraint(equalTo: trailingAnchor)
-        let menuHeight = menuView.heightAnchor.constraint(equalToConstant: menuViewHeight)
+        menuHeight = menuView.heightAnchor.constraint(equalToConstant: menuViewHeight)
         
         var menuConstraints: [NSLayoutConstraint] = []
         menuConstraints.append(menuTop)
@@ -235,12 +263,20 @@ class JuScrollContainerView: UIView {
         NSLayoutConstraint.activate(all)
     }
     
-    private func layoutSomeSubView() {
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        print("\nlayoutSubviews")
+        
+        resetSubviewsLayoutIfNeeded()
+    }
+
+    private func resetSubviewsLayoutIfNeeded() {
+        print("resetSubviewsLayoutIfNeeded\n")
+        
         var contentSize = scrollView.bounds.size
         contentSize.width = contentSize.width * CGFloat(buttonItems.count)
         scrollView.contentSize = contentSize
         
-        // has [viewControllersFrame]
         itemsViewFrameOriginX.removeAll()
         for i in 0 ..< viewItems.count {
             var itemFrame = scrollView.bounds
@@ -262,13 +298,26 @@ class JuScrollContainerView: UIView {
         }
         
         // for sectionIndicatorView
-        indicatorView.frame = CGRect(x: indicatorOriginsX[lastIndex], y: menuView.frame.height - realTitleBottomMargin, width: indicatorWidth, height: indicatorHeight)
+        
+        
+        var indicatorX: CGFloat = 0
+        if userDefaultOffsetPage {  // For Default page
+            userDefaultOffsetPage = false
+
+            let offset = CGPoint(x: CGFloat(defaultOffsetPage)*scrollView.bounds.width, y: 0)
+            scrollView.setContentOffset(offset, animated: false)
+            
+            indicatorX = indicatorOriginsX[defaultOffsetPage]
+        } else { // For rotate
+            let offset = CGPoint(x: scrollView.bounds.width * CGFloat(lastIndex), y: 0)
+            scrollView.setContentOffset(offset, animated: false)
+            
+            indicatorX = indicatorOriginsX[lastIndex]
+        }
+        
+        indicatorView.frame = CGRect(x: indicatorX, y: menuView.frame.height - realTitleBottomMargin, width: indicatorWidth, height: indicatorHeight)
         indicatorViewLastOriginX = indicatorView.frame.origin.x
-        
-        // For rotate
-        let contentOffset = CGPoint(x: scrollView.bounds.width * CGFloat(lastIndex), y: 0)
-        scrollView.setContentOffset(contentOffset, animated: false)
-        
+
         // indicator scroll scale
         let indicatorScale = indicatorOriginsX[1] - indicatorOriginsX[0]
         scale = indicatorScale / UIScreen.main.bounds.size.width
@@ -313,14 +362,21 @@ class JuScrollContainerView: UIView {
         NotificationCenter.default.post(name: atCurrentIndexNotificationName, object: nil, userInfo: userInfo)
     }
     
-    private var lastIndex = 0
+    private var lastIndex = 0 {
+        didSet {
+            for i in 0..<buttonItems.count {
+                buttonItems[i].titleLabel?.textColor = i == lastIndex ? selectedItemColor : unselectedItemColor
+            }
+        }
+    }
+    
     // MARK: - Menu button tapped
     @objc private func contentOffSetXForButton(sender: UIButton){
         let currentTitle = sender.currentTitle!
         let index = titles.index(of: currentTitle)!
         
-        let scrollWithAnimation = canScrollWithAnimation(current: index)
         lastIndex = index
+        let scrollWithAnimation = canScrollWithAnimation(current: index)
         
         let shouldScrollOffset = CGPoint(x: CGFloat(index)*scrollView.bounds.width, y: 0)
         scrollView.setContentOffset(shouldScrollOffset, animated: scrollWithAnimation)

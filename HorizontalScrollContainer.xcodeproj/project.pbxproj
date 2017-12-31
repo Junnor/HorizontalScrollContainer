@@ -16,6 +16,7 @@
 		8B1559051FF8D1C7004E13B4 /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B1559021FF8D1C7004E13B4 /* FirstViewController.swift */; };
 		8B1559061FF8D1C7004E13B4 /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B1559031FF8D1C7004E13B4 /* SecondViewController.swift */; };
 		8B1559071FF8D1C7004E13B4 /* ThirdViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B1559041FF8D1C7004E13B4 /* ThirdViewController.swift */; };
+		8B3D4B921FF8D5AD00331791 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3D4B911FF8D5AD00331791 /* DetailViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		8B1559021FF8D1C7004E13B4 /* FirstViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
 		8B1559031FF8D1C7004E13B4 /* SecondViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecondViewController.swift; sourceTree = "<group>"; };
 		8B1559041FF8D1C7004E13B4 /* ThirdViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThirdViewController.swift; sourceTree = "<group>"; };
+		8B3D4B911FF8D5AD00331791 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 				8B1559021FF8D1C7004E13B4 /* FirstViewController.swift */,
 				8B1559031FF8D1C7004E13B4 /* SecondViewController.swift */,
 				8B1559041FF8D1C7004E13B4 /* ThirdViewController.swift */,
+				8B3D4B911FF8D5AD00331791 /* DetailViewController.swift */,
 				8B1559081FF8D384004E13B4 /* Container */,
 				8B1558F21FF8D134004E13B4 /* Main.storyboard */,
 				8B1558F51FF8D134004E13B4 /* Assets.xcassets */,
@@ -162,6 +165,7 @@
 				8B1559061FF8D1C7004E13B4 /* SecondViewController.swift in Sources */,
 				8B1559071FF8D1C7004E13B4 /* ThirdViewController.swift in Sources */,
 				8B1559051FF8D1C7004E13B4 /* FirstViewController.swift in Sources */,
+				8B3D4B921FF8D5AD00331791 /* DetailViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

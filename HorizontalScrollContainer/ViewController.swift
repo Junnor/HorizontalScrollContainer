@@ -65,8 +65,23 @@ class ViewController: UIViewController {
                                                 buttonItems: buttonItems,
                                                 viewItems: viewItems)
         containerView.addSubview(scrollContainer)
+        
+        // Set properties
         scrollContainer.containerTitle = controllerTitle
         
+        scrollContainer.defaultOffsetPage = 1
+        scrollContainer.menuViewHeight = 50
+        scrollContainer.menuTitleViewColor = UIColor.cyan.withAlphaComponent(1.0)
+        
+        scrollContainer.itemFont = UIFont.systemFont(ofSize: 20)
+        scrollContainer.selectedItemColor = UIColor.red
+        scrollContainer.unselectedItemColor = UIColor.black
+        
+        scrollContainer.indicatorColor = UIColor.red
+        scrollContainer.indicatorWidth = 100
+        scrollContainer.indicatorHeight = 1
+
+
         // Add subViewControllers to self
         addChildViewController(onevc)
         onevc.didMove(toParentViewController: self)
