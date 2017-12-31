@@ -24,7 +24,6 @@ class ViewController: UIViewController {
         super.viewDidLayoutSubviews()
                 
         scrollContainer.frame = containerView.bounds
-        scrollContainer.setNeedsUpdateConstraints()
     }
     
     @IBOutlet weak var containerView: UIView!
@@ -69,18 +68,17 @@ class ViewController: UIViewController {
         // Set properties
         scrollContainer.containerTitle = controllerTitle
         
-        scrollContainer.defaultOffsetPage = 1
-        scrollContainer.menuViewHeight = 50
-        scrollContainer.menuTitleViewColor = UIColor.cyan.withAlphaComponent(1.0)
-        
-        scrollContainer.itemFont = UIFont.systemFont(ofSize: 20)
-        scrollContainer.selectedItemColor = UIColor.red
-        scrollContainer.unselectedItemColor = UIColor.black
-        
-        scrollContainer.indicatorColor = UIColor.red
-        scrollContainer.indicatorWidth = 100
-        scrollContainer.indicatorHeight = 1
-
+//        scrollContainer.defaultOffsetPage = 1
+//        scrollContainer.menuViewHeight = 50
+//        scrollContainer.menuTitleViewColor = UIColor.cyan.withAlphaComponent(1.0)
+//
+//        scrollContainer.itemFont = UIFont.systemFont(ofSize: 20)
+//        scrollContainer.selectedItemColor = UIColor.red
+//        scrollContainer.unselectedItemColor = UIColor.black
+//
+//        scrollContainer.indicatorColor = UIColor.red
+//        scrollContainer.indicatorWidth = 100
+//        scrollContainer.indicatorHeight = 1
 
         // Add subViewControllers to self
         addChildViewController(onevc)
