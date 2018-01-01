@@ -8,6 +8,8 @@
 
 import UIKit
 
+private let defaultSelectedPage = 0
+
 extension NSNotification.Name {
     static let ShowMenuItem = NSNotification.Name(rawValue: "ShowMenuItem")
 }
@@ -50,10 +52,16 @@ class JuScrollContainerView: UIView {
     
     // MARK: - Public properties
     
+    
     // 第一次展示的时候显示的页面，默认为第一页
-    var defaultOffsetPage = 0 {
+    var defaultOffsetPage = defaultSelectedPage {
         didSet {
-            userDefaultOffsetPage = true
+            if defaultOffsetPage >= buttonItems.count {
+                fatalError("The defaultOffsetPage property must be less than buttonItems.count")
+            } else {
+                userDefaultOffsetPage = true
+                lastIndex = defaultOffsetPage
+            }
         }
         
     }
@@ -79,18 +87,15 @@ class JuScrollContainerView: UIView {
     var unselectedItemColor = UIColor.darkGray {
         didSet {
             print("set unselectedItemColor")
-            for button in buttonItems {
-                button.titleLabel?.textColor = unselectedItemColor
-            }
         }
     }
     
     var selectedItemColor = UIColor.darkGray {
         didSet {
             print("set selectedItemColor")
-            for button in buttonItems {
-                button.titleLabel?.textColor = selectedItemColor
-            }
+            
+            // 在这里重新赋值主要是防止属性设置的顺序问题
+            lastIndex = defaultOffsetPage
         }
     }
 
@@ -173,13 +178,13 @@ class JuScrollContainerView: UIView {
         
         for button in buttonItems {
             button.setTitleColor(unselectedItemColor, for: .normal)
-            titles.append(button.currentTitle!)
             button.titleLabel?.textColor = unselectedItemColor
             button.titleLabel?.font = itemFont
             button.addTarget(self,
                              action: #selector(contentOffSetXForButton(sender:)),
                              for: .touchUpInside)
             
+            titles.append(button.currentTitle!)
             titleStackView.addArrangedSubview(button)
         }
         
@@ -221,7 +226,7 @@ class JuScrollContainerView: UIView {
         let titleViewTop = menuTitleView.topAnchor.constraint(equalTo: menuView.topAnchor)
         let titleViewLeading = menuTitleView.leadingAnchor.constraint(equalTo: menuView.leadingAnchor)
         let titleViewTrailing = menuTitleView.trailingAnchor.constraint(equalTo: menuView.trailingAnchor)
-        let titleViewBottom = menuTitleView.bottomAnchor.constraint(equalTo: menuView.bottomAnchor)  // Add some margin if wanted
+        let titleViewBottom = menuTitleView.bottomAnchor.constraint(equalTo: menuView.bottomAnchor)
         
         var titleViewConstraints: [NSLayoutConstraint] = []
         titleViewConstraints.append(titleViewTop)
@@ -298,8 +303,6 @@ class JuScrollContainerView: UIView {
         }
         
         // for sectionIndicatorView
-        
-        
         var indicatorX: CGFloat = 0
         if userDefaultOffsetPage {  // For Default page
             userDefaultOffsetPage = false
@@ -329,7 +332,7 @@ class JuScrollContainerView: UIView {
             // 通知第一次显示对应的 vc
             if self.firstShowWithItems[defaultOffsetPage] == false {
                 // 设置偏移量
-                if defaultOffsetPage != 0 {
+                if defaultOffsetPage != defaultSelectedPage {
                     let offset = CGPoint(x: UIScreen.main.bounds.width * CGFloat(defaultOffsetPage), y: 0)
                     scrollView.setContentOffset(offset, animated: false)
                 }
@@ -350,7 +353,9 @@ class JuScrollContainerView: UIView {
             var userInfo: [String: Any] = [:]
             userInfo["index"] = index
             userInfo["value"] = value
-            NotificationCenter.default.post(name: NSNotification.Name.ShowMenuItem, object: nil, userInfo: userInfo)
+            NotificationCenter.default.post(name: NSNotification.Name.ShowMenuItem,
+                                            object: nil,
+                                            userInfo: userInfo)
         }
     }
     
@@ -359,13 +364,16 @@ class JuScrollContainerView: UIView {
         var userInfo: [String: Int] = [:]
         userInfo["currentIndex"] = index
         
-        NotificationCenter.default.post(name: atCurrentIndexNotificationName, object: nil, userInfo: userInfo)
+        NotificationCenter.default.post(name: atCurrentIndexNotificationName,
+                                        object: nil,
+                                        userInfo: userInfo)
     }
     
-    private var lastIndex = 0 {
+    private var lastIndex = defaultSelectedPage {
         didSet {
             for i in 0..<buttonItems.count {
-                buttonItems[i].titleLabel?.textColor = i == lastIndex ? selectedItemColor : unselectedItemColor
+                let color = i == lastIndex ? selectedItemColor : unselectedItemColor
+                buttonItems[i].setTitleColor(color, for: .normal)
             }
         }
     }
@@ -375,9 +383,9 @@ class JuScrollContainerView: UIView {
         let currentTitle = sender.currentTitle!
         let index = titles.index(of: currentTitle)!
         
-        lastIndex = index
         let scrollWithAnimation = canScrollWithAnimation(current: index)
-        
+        lastIndex = index
+
         let shouldScrollOffset = CGPoint(x: CGFloat(index)*scrollView.bounds.width, y: 0)
         scrollView.setContentOffset(shouldScrollOffset, animated: scrollWithAnimation)
         UIView.animate(withDuration: moveDuration, animations: {

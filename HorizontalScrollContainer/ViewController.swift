@@ -69,15 +69,16 @@ class ViewController: UIViewController {
         scrollContainer.containerTitle = controllerTitle
         
 //        scrollContainer.defaultOffsetPage = 1
-//        scrollContainer.menuViewHeight = 50
+
+//        scrollContainer.menuViewHeight = 70
 //        scrollContainer.menuTitleViewColor = UIColor.cyan.withAlphaComponent(1.0)
-//
-//        scrollContainer.itemFont = UIFont.systemFont(ofSize: 20)
+
+        scrollContainer.itemFont = UIFont.systemFont(ofSize: 17)
 //        scrollContainer.selectedItemColor = UIColor.red
 //        scrollContainer.unselectedItemColor = UIColor.black
-//
+
 //        scrollContainer.indicatorColor = UIColor.red
-//        scrollContainer.indicatorWidth = 100
+//        scrollContainer.indicatorWidth = 50
 //        scrollContainer.indicatorHeight = 1
 
         // Add subViewControllers to self
