@@ -17,6 +17,7 @@ extension NSNotification.Name {
 class JuScrollContainerView: UIView {
 
     // MARK: - Designated init
+    
     init(frame: CGRect, buttonItems: [UIButton], viewItems: [UIView]) {
         super.init(frame: frame)
         
@@ -44,16 +45,19 @@ class JuScrollContainerView: UIView {
     }
     
 
-    // MARK: - 父类通知
-    var containerTitle = ""  // 获取superview的title，为了更好的通知
+    // MARK: - Notification
+    
+    /// Set container title to have a better notification name
+    var containerTitle = ""
+    
+    /// Scroll to current page's notificatin name
     var atCurrentIndexNotificationName: NSNotification.Name {
         return NSNotification.Name(rawValue: "com.nyato.manzhanmiao.\(containerTitle)AtMenuItem")
     }
     
     // MARK: - Public properties
     
-    
-    // 第一次展示的时候显示的页面，默认为第一页
+    /// Default offset page for container
     var defaultOffsetPage = defaultSelectedPage {
         didSet {
             if defaultOffsetPage >= buttonItems.count {
@@ -66,7 +70,7 @@ class JuScrollContainerView: UIView {
         
     }
     
-    // For menu view
+    /// Menu view height
     var menuViewHeight: CGFloat = 49 {
         didSet {
             print("set menuViewHeight")
@@ -76,29 +80,32 @@ class JuScrollContainerView: UIView {
         }
     }
     
-    var menuTitleViewColor = UIColor(red: 251/255.0, green: 250/255.0, blue: 251/255.0, alpha: 1.0) {
+    /// Menu view background color
+    var menuTitleViewBackgroundColor = UIColor(red: 251/255.0, green: 250/255.0, blue: 251/255.0, alpha: 1.0) {
         didSet {
             print("set menuTitleViewColor")
-            menuTitleView?.backgroundColor = menuTitleViewColor
+            menuTitleView?.backgroundColor = menuTitleViewBackgroundColor
         }
     }
     
-    // For button item
+    /// Unselected button item text color
     var unselectedItemColor = UIColor.darkGray {
         didSet {
             print("set unselectedItemColor")
         }
     }
     
+    /// Selected button item text color
     var selectedItemColor = UIColor.darkGray {
         didSet {
             print("set selectedItemColor")
             
-            // 在这里重新赋值主要是防止属性设置的顺序问题
+            // Prevent the order is not right when set public properties value
             lastIndex = defaultOffsetPage
         }
     }
 
+    /// Button item font
     var itemFont = UIFont.systemFont(ofSize: 15) {
         didSet {
             print("set itemFont")
@@ -108,7 +115,7 @@ class JuScrollContainerView: UIView {
         }
     }
     
-    // For indicator
+    /// Indicator color
     var indicatorColor = UIColor.gray {
         didSet {
             print("set indicatorColor")
@@ -116,6 +123,7 @@ class JuScrollContainerView: UIView {
         }
     }
     
+    /// Indicator view width, value within (0 , screenWidth/buttonItems.count)
     var indicatorWidth: CGFloat = 40 {
         didSet {
             print("set indicatorWidth")
@@ -123,10 +131,14 @@ class JuScrollContainerView: UIView {
         }
     }
     
+    /// Indicator view height, value within (0 , realTitleBottomMargin]
     var indicatorHeight: CGFloat = 3 {
         didSet {
             print("set indicatorHeight")
             indicatorView?.frame.size.height = indicatorHeight
+            
+            indicatorView?.layer.cornerRadius = indicatorHeight/2
+            indicatorView?.layer.masksToBounds = true
         }
     }
     
@@ -162,11 +174,13 @@ class JuScrollContainerView: UIView {
         
         // Title container
         menuTitleView = UIView()
-        menuTitleView.backgroundColor = menuTitleViewColor
+        menuTitleView.backgroundColor = menuTitleViewBackgroundColor
         titleStackView = UIStackView()
         
         // Indicator
         indicatorView = UIView()
+        indicatorView.layer.cornerRadius = indicatorHeight/2
+        indicatorView.layer.masksToBounds = true
         indicatorView.backgroundColor = indicatorColor
         
         // ScrollView
@@ -329,9 +343,10 @@ class JuScrollContainerView: UIView {
     private func firstLoadDataNotification() {
         
         if self.firstShowWithItems.count > defaultOffsetPage {
-            // 通知第一次显示对应的 vc
+            // Notification defaultOffsetPage view controller when first load container
             if self.firstShowWithItems[defaultOffsetPage] == false {
-                // 设置偏移量
+              
+                // Set scrollview offset with container first loaded
                 if defaultOffsetPage != defaultSelectedPage {
                     let offset = CGPoint(x: UIScreen.main.bounds.width * CGFloat(defaultOffsetPage), y: 0)
                     scrollView.setContentOffset(offset, animated: false)

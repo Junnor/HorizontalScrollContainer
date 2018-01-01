@@ -16,7 +16,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         title = controllerTitle
-        
+                
         initializerMenuContainer()
     }
     
@@ -41,7 +41,7 @@ class ViewController: UIViewController {
         
         one.setTitle("One", for: .normal)
         two.setTitle("Two", for: .normal)
-        three.setTitle("Threeeeeeeee", for: .normal)
+        three.setTitle("Three", for: .normal)
         
         var buttonItems = [UIButton]()
         buttonItems.append(one)
@@ -73,13 +73,13 @@ class ViewController: UIViewController {
 //        scrollContainer.menuViewHeight = 70
 //        scrollContainer.menuTitleViewColor = UIColor.cyan.withAlphaComponent(1.0)
 
-        scrollContainer.itemFont = UIFont.systemFont(ofSize: 17)
+//        scrollContainer.itemFont = UIFont.systemFont(ofSize: 17)
 //        scrollContainer.selectedItemColor = UIColor.red
 //        scrollContainer.unselectedItemColor = UIColor.black
 
 //        scrollContainer.indicatorColor = UIColor.red
 //        scrollContainer.indicatorWidth = 50
-//        scrollContainer.indicatorHeight = 1
+//        scrollContainer.indicatorHeight = 5
 
         // Add subViewControllers to self
         addChildViewController(onevc)
@@ -90,11 +90,6 @@ class ViewController: UIViewController {
         
         addChildViewController(threevc)
         threevc.didMove(toParentViewController: self)
-        
-        // Color view
-        onevc.view.backgroundColor = UIColor.cyan.withAlphaComponent(1)
-        twovc.view.backgroundColor = UIColor.cyan.withAlphaComponent(0.5)
-        threevc.view.backgroundColor = UIColor.cyan.withAlphaComponent(0.2)
         
         // Set notification
         NotificationCenter.default.addObserver(self,
