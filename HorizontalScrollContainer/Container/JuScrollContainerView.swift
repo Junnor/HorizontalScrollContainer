@@ -52,7 +52,7 @@ class JuScrollContainerView: UIView {
     
     /// Scroll to current page's notificatin name
     var atCurrentIndexNotificationName: NSNotification.Name {
-        return NSNotification.Name(rawValue: "com.nyato.manzhanmiao.\(containerTitle)AtMenuItem")
+        return NSNotification.Name(rawValue: "com.ju.\(containerTitle)AtMenuItem")
     }
     
     // MARK: - Public properties
