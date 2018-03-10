@@ -60,25 +60,30 @@ class ViewController: UIViewController {
         viewItems.append(threevc.view)
         
         // Container(subViewController's view will added to container)
-        scrollContainer = JuScrollContainerView(frame: containerView.bounds, buttonItems: buttonItems, viewItems: viewItems, managerController: self, isTitleViewStyle: true, useSeperateLine: false)
+        scrollContainer = JuScrollContainerView(frame: containerView.bounds,
+                                                titles: ["One", "Two", "Three"],
+                                                viewItems: viewItems,
+                                                managerController: self,
+                                                isTitleViewStyle: false,
+                                                useSeperateLine: false,
+                                                useBadge: true,
+                                                isRedPoint: false)
         scrollContainer.delegate = self
+        scrollContainer.showRedBadgeValues = [1: 3]
         containerView.addSubview(scrollContainer)
         
         
         // Set properties
         
-//        scrollContainer.defaultOffsetPage = 1
+        scrollContainer.menuViewHeight = 70
 
-//        scrollContainer.menuViewHeight = 70
-//        scrollContainer.menuTitleViewColor = UIColor.cyan.withAlphaComponent(1.0)
+        scrollContainer.itemFont = UIFont.systemFont(ofSize: 17)
+        scrollContainer.selectedItemColor = UIColor.red
+        scrollContainer.unselectedItemColor = UIColor.black
 
-//        scrollContainer.itemFont = UIFont.systemFont(ofSize: 17)
-//        scrollContainer.selectedItemColor = UIColor.red
-//        scrollContainer.unselectedItemColor = UIColor.black
-
-//        scrollContainer.indicatorColor = UIColor.red
-//        scrollContainer.indicatorWidth = 50
-//        scrollContainer.indicatorHeight = 5
+        scrollContainer.indicatorColor = UIColor.red
+        scrollContainer.indicatorWidth = 50
+        scrollContainer.indicatorHeight = 5
 
         // Add subViewControllers to self
         addChildViewController(onevc)
@@ -99,9 +104,13 @@ extension ViewController: JuScrollContainerViewDelegate {
     
     func scrollContainerView(containerView: JuScrollContainerView, scrollAt page: Int, isFirstScrollToIt: Bool) {
         if isFirstScrollToIt {
-            
+            print("isFirstScrollToIt, page = \(page)")
+            if page == 1 {
+                scrollContainer.shouldHideBadgeIndex = page
+            }
         } else {
-            
+            print("not isFirstScrollToIt page = \(page)")
         }
     }
+    
 }

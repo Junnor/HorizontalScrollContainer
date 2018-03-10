@@ -27,24 +27,36 @@ class JuScrollContainerView: UIView {
     
     // MARK: - Designated init
     
-    init(frame: CGRect, buttonItems: [UIButton], viewItems: [UIView], managerController: UIViewController, isTitleViewStyle: Bool = false, useSeperateLine: Bool = false) {
+    init(frame: CGRect,
+         titles: [String],
+         viewItems: [UIView],
+         managerController: UIViewController,
+         isTitleViewStyle: Bool = false,
+         useSeperateLine: Bool = false,
+         useBadge: Bool = false,
+         isRedPoint: Bool = false) {
+        
         super.init(frame: frame)
         
-        //        print("init(frame: CGRect, buttonItems: [UIButton], viewItems: [UIView])")
         
-        if buttonItems.count != viewItems.count {
+        if titles.count != viewItems.count {
             fatalError("items count not equal")
         }
         
-        self.buttonItems = buttonItems
+        
+        self.menuTitles = titles
         self.viewItems = viewItems
-        self.useSeperateLine = useSeperateLine
-        self.isTitleViewStyle = isTitleViewStyle
         self.managerController = managerController
         
-        for _ in 0..<buttonItems.count {
+        self.useSeperateLine = useSeperateLine
+        self.isTitleViewStyle = isTitleViewStyle
+        self.useBadge = useBadge
+        self.isRedPoint = isRedPoint
+        
+        for _ in 0..<viewItems.count {
             hasShowPages.append(false)
         }
+        
         
         addAllSubView()
         setupConstraints()
@@ -64,8 +76,8 @@ class JuScrollContainerView: UIView {
     /// Default offset page for container
     var defaultOffsetPage = defaultSelectedPage {
         didSet {
-            if defaultOffsetPage >= buttonItems.count {
-                fatalError("The defaultOffsetPage property must be less than buttonItems.count")
+            if defaultOffsetPage >= viewItems.count {
+                fatalError("The defaultOffsetPage property must be less than viewItems.count")
             } else {
                 userDefaultOffsetPage = true
                 lastIndex = defaultOffsetPage
@@ -113,8 +125,8 @@ class JuScrollContainerView: UIView {
     var itemFont = UIFont.systemFont(ofSize: 15) {
         didSet {
             //            print("set itemFont")
-            for button in buttonItems {
-                button.titleLabel?.font = itemFont
+            for title in titleLabels {
+                title.font = itemFont
             }
         }
     }
@@ -127,7 +139,7 @@ class JuScrollContainerView: UIView {
         }
     }
     
-    /// Indicator view width, value within (0 , screenWidth/buttonItems.count)
+    /// Indicator view width, value within (0 , screenWidth/viewItems.count)
     var indicatorWidth: CGFloat = 40 {
         didSet {
             //            print("set indicatorWidth")
@@ -146,11 +158,42 @@ class JuScrollContainerView: UIView {
         }
     }
     
+    
+    /// [index: value]
+    var showRedBadgeValues: [Int: Int] = [:] {
+        didSet {
+            for (index, value) in showRedBadgeValues {
+                if index < redBadgeLabels.count { // Not out if bounds
+                    redBadgeLabels[index].isHidden = false
+                    
+                    if !isRedPoint {
+                        redBadgeLabels[index].text = "\(value)"
+                    }
+                }
+            }
+        }
+    }
+    
+    var shouldHideBadgeIndex: Int = 0 {
+        didSet {
+            if shouldHideBadgeIndex < redBadgeLabels.count {
+                redBadgeLabels[shouldHideBadgeIndex].isHidden = true
+            }
+        }
+    }
+    
+    
     // MARK: - Private properties
+    
+    private var titleViews: [UIView] = []
+    private var redBadgeLabels: [UILabel] = []  // 是小红点的情况就不显示小红点文字了
+    private var titleLabels: [UILabel] = []
     
     private var buttonItems: [UIButton] = []
     private var viewItems: [UIView] = []
     private var useSeperateLine = false
+    private var useBadge = false
+    private var isRedPoint = false
     
     private let seperateLineHeight: CGFloat = 0.5
     
@@ -161,7 +204,7 @@ class JuScrollContainerView: UIView {
     private var indicatorView: UIView!
     
     private var menuHeight: NSLayoutConstraint!
-    private var titles: [String] = [String]()
+    private var menuTitles: [String] = [String]()
     private var indicatorOriginsX: [CGFloat] = [CGFloat]()
     private var itemsViewFrameOriginX: [CGFloat] = [CGFloat]()
     
@@ -171,6 +214,7 @@ class JuScrollContainerView: UIView {
     
     private let moveDuration: TimeInterval = 0.2
     private let realTitleBottomMargin: CGFloat = 6
+    private var badgeWidth: CGFloat = 18
     
     // MARK: - Helper
     
@@ -204,19 +248,43 @@ class JuScrollContainerView: UIView {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.showsHorizontalScrollIndicator = false
         
-        for button in buttonItems {
-            button.setTitleColor(unselectedItemColor, for: .normal)
-            button.titleLabel?.textColor = unselectedItemColor
-            button.titleLabel?.font = itemFont
+        if isRedPoint {
+            badgeWidth = 6
+        }
+        
+        for i in 0..<menuTitles.count {
+            let view = UIView()
+            
+            let button = UIButton(type: .custom)
+            button.tag = i
             button.addTarget(self,
                              action: #selector(contentOffSetXForButton(sender:)),
                              for: .touchUpInside)
             
-            titles.append(button.currentTitle!)
-            titleStackView.addArrangedSubview(button)
+            let titleLabel = UILabel()
+            titleLabel.text = menuTitles[i]
+            
+            let badgeLabel = UILabel()
+            badgeLabel.backgroundColor = UIColor(red: 251/255.0, green: 98/255.0, blue: 100/255.0, alpha: 1)
+            badgeLabel.textColor = UIColor.white
+            badgeLabel.layer.cornerRadius = badgeWidth/2
+            badgeLabel.layer.masksToBounds = true
+            badgeLabel.textAlignment = .center
+            badgeLabel.isHidden = true
+            
+            view.addSubview(titleLabel)
+            view.addSubview(badgeLabel)
+            view.addSubview(button)
+            
+            redBadgeLabels.append(badgeLabel)
+            titleLabels.append(titleLabel)
+            buttonItems.append(button)
+            titleViews.append(view)
+            
+            titleStackView.addArrangedSubview(view)
         }
         
-        titleStackView.alignment = .center
+        titleStackView.alignment = .fill
         titleStackView.axis = .horizontal
         titleStackView.distribution = .fillEqually
         
@@ -267,7 +335,6 @@ class JuScrollContainerView: UIView {
         let titleViewLeading = menuTitleView.leadingAnchor.constraint(equalTo: menuView.leadingAnchor)
         let titleViewTrailing = menuTitleView.trailingAnchor.constraint(equalTo: menuView.trailingAnchor)
         let titleViewBottom = menuTitleView.bottomAnchor.constraint(equalTo: menuView.bottomAnchor, constant: useSeperateLine ? -0.5 : 0)
-        //        let titleViewBottom = menuTitleView.bottomAnchor.constraint(equalTo: menuView.bottomAnchor)
         
         var titleViewConstraints: [NSLayoutConstraint] = []
         titleViewConstraints.append(titleViewTop)
@@ -280,13 +347,51 @@ class JuScrollContainerView: UIView {
         let titleStackViewLeading = titleStackView.leadingAnchor.constraint(equalTo: menuTitleView.leadingAnchor)
         let titleStackViewTrailing = titleStackView.trailingAnchor.constraint(equalTo: menuTitleView.trailingAnchor)
         let titleStatckViewBottom = titleStackView.bottomAnchor.constraint(equalTo: menuTitleView.bottomAnchor, constant: -0.5)
-        //        let titleStatckViewBottom = titleStackView.bottomAnchor.constraint(equalTo: menuTitleView.bottomAnchor)
         
         var titleStackViewConstraints: [NSLayoutConstraint] = []
         titleStackViewConstraints.append(titleStackViewTop)
         titleStackViewConstraints.append(titleStackViewLeading)
         titleStackViewConstraints.append(titleStackViewTrailing)
         titleStackViewConstraints.append(titleStatckViewBottom)
+        
+        // Subview in titleStackView
+        var titleLabelConstraints: [NSLayoutConstraint] = []
+        var titleButtonConstraints: [NSLayoutConstraint] = []
+        var badgeLabelConstraints: [NSLayoutConstraint] = []
+        for i in 0..<titleStackView.arrangedSubviews.count {
+            
+            
+            titleLabels[i].translatesAutoresizingMaskIntoConstraints = false
+            buttonItems[i].translatesAutoresizingMaskIntoConstraints = false
+            redBadgeLabels[i].translatesAutoresizingMaskIntoConstraints = false
+            
+            
+            let titleCenterX = titleLabels[i].centerXAnchor.constraint(equalTo: titleViews[i].centerXAnchor)
+            let titleCenterY = titleLabels[i].centerYAnchor.constraint(equalTo: titleViews[i].centerYAnchor)
+            
+            let titleButtonTop = buttonItems[i].topAnchor.constraint(equalTo: titleViews[i].topAnchor)
+            let titleButtonBottom = buttonItems[i].bottomAnchor.constraint(equalTo: titleViews[i].bottomAnchor)
+            let titleButtonLeading = buttonItems[i].leadingAnchor.constraint(equalTo: titleViews[i].leadingAnchor)
+            let titleButtonTrailing = buttonItems[i].trailingAnchor.constraint(equalTo: titleViews[i].trailingAnchor)
+            
+            let badgeWidth = redBadgeLabels[i].widthAnchor.constraint(equalToConstant: self.badgeWidth)
+            let badgeHeight = redBadgeLabels[i].heightAnchor.constraint(equalToConstant: self.badgeWidth)
+            let badgeTop = redBadgeLabels[i].topAnchor.constraint(equalTo: titleLabels[i].topAnchor, constant: -5)
+            let badgeLeading = redBadgeLabels[i].leadingAnchor.constraint(equalTo: titleLabels[i].trailingAnchor, constant: 2)
+            
+            titleLabelConstraints.append(titleCenterX)
+            titleLabelConstraints.append(titleCenterY)
+            
+            titleButtonConstraints.append(titleButtonTop)
+            titleButtonConstraints.append(titleButtonBottom)
+            titleButtonConstraints.append(titleButtonLeading)
+            titleButtonConstraints.append(titleButtonTrailing)
+            
+            badgeLabelConstraints.append(badgeWidth)
+            badgeLabelConstraints.append(badgeHeight)
+            badgeLabelConstraints.append(badgeTop)
+            badgeLabelConstraints.append(badgeLeading)
+        }
         
         // Scroll view
         var scrollViewConstraints: [NSLayoutConstraint] = []
@@ -304,15 +409,25 @@ class JuScrollContainerView: UIView {
         all += titleViewConstraints
         all += titleStackViewConstraints
         all += scrollViewConstraints
+        all += titleLabelConstraints
+        all += titleButtonConstraints
+        all += badgeLabelConstraints
         
         NSLayoutConstraint.activate(all)
         
         // Is title view style
-        if isTitleViewStyle {
+        if isTitleViewStyle {  // 最好是设置为两个字的
             menuView.translatesAutoresizingMaskIntoConstraints = false
             // add your views and set up all the constraints
             
-            let width: CGFloat = min(CGFloat(50 * buttonItems.count), UIScreen.main.bounds.width - 40)
+            var sumTitleTextCount = 0
+            for text in menuTitles {
+                sumTitleTextCount += text.count
+            }
+            
+            let itemWidth =  useBadge ? 70 : 50
+            let standard = itemWidth * viewItems.count
+            let width: CGFloat = min(CGFloat(standard), UIScreen.main.bounds.width - 40)
             menuView.widthAnchor.constraint(equalToConstant: width).isActive = true
             menuView.heightAnchor.constraint(equalToConstant: 40).isActive = true
             
@@ -339,7 +454,7 @@ class JuScrollContainerView: UIView {
         //        print("resetSubviewsLayoutIfNeeded\n")
         
         var contentSize = scrollView.bounds.size
-        contentSize.width = contentSize.width * CGFloat(buttonItems.count)
+        contentSize.width = contentSize.width * CGFloat(viewItems.count)
         scrollView.contentSize = contentSize
         
         itemsViewFrameOriginX.removeAll()
@@ -355,8 +470,8 @@ class JuScrollContainerView: UIView {
         // for menuItems originX
         indicatorOriginsX.removeAll()
         
-        let itemWidth: CGFloat = menuView.bounds.width/CGFloat(buttonItems.count)
-        for i in 0..<buttonItems.count {
+        let itemWidth: CGFloat = menuView.bounds.width/CGFloat(viewItems.count)
+        for i in 0..<viewItems.count {
             let tmpFrame = CGRect(x: itemWidth*CGFloat(i), y: 0, width: itemWidth, height: 1)
             let indicatorOriginX = tmpFrame.midX - indicatorWidth/2
             indicatorOriginsX.append(indicatorOriginX)
@@ -419,17 +534,16 @@ class JuScrollContainerView: UIView {
     
     private var lastIndex = defaultSelectedPage {
         didSet {
-            for i in 0..<buttonItems.count {
+            for i in 0..<viewItems.count {
                 let color = i == lastIndex ? selectedItemColor : unselectedItemColor
-                buttonItems[i].setTitleColor(color, for: .normal)
+                titleLabels[i].textColor = color
             }
         }
     }
     
     // MARK: - Menu button tapped
     @objc private func contentOffSetXForButton(sender: UIButton){
-        let currentTitle = sender.currentTitle!
-        let index = titles.index(of: currentTitle)!
+        let index = sender.tag
         
         let scrollWithAnimation = canScrollWithAnimation(current: index)
         lastIndex = index
