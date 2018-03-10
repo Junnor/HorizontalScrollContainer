@@ -66,7 +66,7 @@ class ViewController: UIViewController {
                                                 managerController: self,
                                                 isTitleViewStyle: false,
                                                 useSeperateLine: false,
-                                                useBadge: true,
+                                                useBadge: false,
                                                 isRedPoint: false)
         scrollContainer.delegate = self
         scrollContainer.showRedBadgeValues = [1: 3]

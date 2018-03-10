@@ -163,7 +163,7 @@ class JuScrollContainerView: UIView {
     var showRedBadgeValues: [Int: Int] = [:] {
         didSet {
             for (index, value) in showRedBadgeValues {
-                if index < redBadgeLabels.count { // Not out if bounds
+                if index < redBadgeLabels.count && useBadge { // Not out if bounds
                     redBadgeLabels[index].isHidden = false
                     
                     if !isRedPoint {
