@@ -12,6 +12,7 @@ import UIKit
 class ViewController: UIViewController {
 
     private let controllerTitle = "Container"
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -20,13 +21,6 @@ class ViewController: UIViewController {
         initializerMenuContainer()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-                
-        scrollContainer.frame = containerView.bounds
-    }
-    
-    @IBOutlet weak var containerView: UIView!
     
     // MARK: - For menu container
     
@@ -34,6 +28,12 @@ class ViewController: UIViewController {
     
     private var scrollContainer: JuScrollContainerView!
     private func initializerMenuContainer() {
+        
+        
+        let containerView = UIView()
+        containerView.frame = CGRect(x: 0, y: 64, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height - 64)
+        view.addSubview(containerView)
+        
         // Button items
         let one = UIButton()
         let two = UIButton()
@@ -60,13 +60,12 @@ class ViewController: UIViewController {
         viewItems.append(threevc.view)
         
         // Container(subViewController's view will added to container)
-        scrollContainer = JuScrollContainerView(frame: containerView.bounds,
-                                                buttonItems: buttonItems,
-                                                viewItems: viewItems)
+        scrollContainer = JuScrollContainerView(frame: containerView.bounds, buttonItems: buttonItems, viewItems: viewItems, managerController: self, isTitleViewStyle: true, useSeperateLine: false)
+        scrollContainer.delegate = self
         containerView.addSubview(scrollContainer)
         
+        
         // Set properties
-        scrollContainer.containerTitle = controllerTitle
         
 //        scrollContainer.defaultOffsetPage = 1
 
@@ -90,19 +89,19 @@ class ViewController: UIViewController {
         
         addChildViewController(threevc)
         threevc.didMove(toParentViewController: self)
-        
-        // Set notification
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(scrollAtIndex(notification:)),
-                                               name: scrollContainer.atCurrentIndexNotificationName,
-                                               object: nil)
     }
     
     
-    @objc private func scrollAtIndex(notification: NSNotification) {
-        guard let userInfo = notification.userInfo,
-            let _ = userInfo["currentIndex"] as? Int else { return }
+    
+}
+
+extension ViewController: JuScrollContainerViewDelegate {
+    
+    func scrollContainerView(containerView: JuScrollContainerView, scrollAt page: Int, isFirstScrollToIt: Bool) {
+        if isFirstScrollToIt {
+            
+        } else {
+            
+        }
     }
-    
-    
 }

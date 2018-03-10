@@ -17,24 +17,11 @@
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Xv1-W4-C1d">
-                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            </view>
-                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <constraints>
-                            <constraint firstItem="Xv1-W4-C1d" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="2ya-52-MSp"/>
-                            <constraint firstItem="Xv1-W4-C1d" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="QeU-wI-irh"/>
-                            <constraint firstItem="Xv1-W4-C1d" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="RlB-Pc-B11"/>
-                            <constraint firstItem="Xv1-W4-C1d" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="iyv-Zk-yaG"/>
-                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <navigationItem key="navigationItem" id="Szk-Oj-prS"/>
                     <connections>
-                        <outlet property="containerView" destination="Xv1-W4-C1d" id="Er1-at-Vxy"/>
                         <segue destination="jYK-wa-DaC" kind="show" identifier="first" id="XBH-9q-4nf"/>
                         <segue destination="QST-hM-nM4" kind="show" identifier="second" id="NX5-WB-xLx"/>
                         <segue destination="0YY-Fw-q54" kind="show" identifier="third" id="naV-f7-kjJ"/>
