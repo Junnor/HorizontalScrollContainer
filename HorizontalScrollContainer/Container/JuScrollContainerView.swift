@@ -214,7 +214,7 @@ class JuScrollContainerView: UIView {
     
     private let moveDuration: TimeInterval = 0.2
     private let realTitleBottomMargin: CGFloat = 6
-    private var badgeWidth: CGFloat = 18
+    private var badgeWidth: CGFloat = 16
     
     // MARK: - Helper
     
@@ -271,6 +271,7 @@ class JuScrollContainerView: UIView {
             badgeLabel.layer.masksToBounds = true
             badgeLabel.textAlignment = .center
             badgeLabel.isHidden = true
+            badgeLabel.font = UIFont.systemFont(ofSize: 10)
             
             view.addSubview(titleLabel)
             view.addSubview(badgeLabel)

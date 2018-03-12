@@ -66,10 +66,10 @@ class ViewController: UIViewController {
                                                 managerController: self,
                                                 isTitleViewStyle: false,
                                                 useSeperateLine: false,
-                                                useBadge: false,
+                                                useBadge: true,
                                                 isRedPoint: false)
         scrollContainer.delegate = self
-        scrollContainer.showRedBadgeValues = [1: 3]
+        scrollContainer.showRedBadgeValues = [2: 1]
         containerView.addSubview(scrollContainer)
         
         
